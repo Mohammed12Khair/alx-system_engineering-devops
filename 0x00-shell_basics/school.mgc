@@ -1,2 +1,2 @@
-#!/bin/bash
-grep "SCHOOL" $1
+O string SCHOOL School data files
+!:mime School
