@@ -16,7 +16,7 @@ def number_of_subscribers(subreddit):
     if subreddit and type(subreddit) is str:
         req = requests.get(
             "https://www.reddit.com/r/{}/about.json".format(subreddit),
-            headers={"User-Agent": "Custom"},
+            headers={"User-Agent": "my-app/0.0.1"},
         )
 
         if req.status_code == 200:
