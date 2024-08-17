@@ -1,50 +1,62 @@
 #!/usr/bin/python3
-""" Module for a function that queries the Reddit API recursively."""
-
-
+""" Queries the Reddit API and returns the number of subscribers """
 import requests
 
 
-def count_words(subreddit, word_list, after='', word_dict={}):
-    """ A function that queries the Reddit API parses the title of
-    all hot articles, and prints a sorted count of given keywords
-    (case-insensitive, delimited by spaces.
-    Javascript should count as javascript, but java should not).
-    If no posts match or the subreddit is invalid, it prints nothing.
+def count_words(subreddit, word_list, after=None, counts={}):
     """
+    Recursively queries the Reddit API, parses the titles of hot articles, and
+    counts the occurrences of specified keywords. Prints the results in
+    descending order by count, and if counts are the same, in ascending order
+    by keyword.
 
-    if not word_dict:
-        for word in word_list:
-            if word.lower() not in word_dict:
-                word_dict[word.lower()] = 0
+    Args:
+        subreddit (str): subreddit to query
+        word_list (list): list of keywords to count
+        after (str): identifier for the next page
+        counts (dict): dictionary to store word counts
 
+    Returns:
+        None
+    """
     if after is None:
-        wordict = sorted(word_dict.items(), key=lambda x: (-x[1], x[0]))
-        for word in wordict:
-            if word[1]:
-                print('{}: {}'.format(word[0], word[1]))
-        return None
+        base_url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
+    else:
+        base_url = 'https://www.reddit.com/r/{}/hot.json?after={}'.format(
+            subreddit, after
+        )
 
-    url = 'https://www.reddit.com/r/{}/hot/.json'.format(subreddit)
-    header = {'user-agent': 'redquery'}
-    parameters = {'limit': 100, 'after': after}
-    response = requests.get(url, headers=header, params=parameters,
-                            allow_redirects=False)
+    headers = {'User-Agent': 'Agent Uche'}
+    params = {'after': after} if after else {}
+
+    response = requests.get(
+        base_url, headers=headers, params=params, allow_redirects=False
+    )
 
     if response.status_code != 200:
-        return None
+        return
 
-    try:
-        hot = response.json()['data']['children']
-        aft = response.json()['data']['after']
-        for post in hot:
-            title = post['data']['title']
-            lower = [word.lower() for word in title.split(' ')]
+    data = response.json()
+    posts = data.get('data', {}).get('children', [])
 
-            for word in word_dict.keys():
-                word_dict[word] += lower.count(word)
+    for post in posts:
+        title = post['data']['title'].lower()
+        for keyword in word_list:
+            keyword = keyword.lower()
+            if (
+                keyword in title
+                and not title.startswith(keyword + '.')
+                and not title.startswith(keyword + '!')
+                and not title.startswith(keyword + '_')
+            ):
+                counts[keyword] = counts.get(keyword, 0) + 1
 
-    except Exception:
-        return None
-
-    count_words(subreddit, word_list, aft, word_dict)
+    next_page = data.get('data', {}).get('after')
+    if next_page:
+        count_words(subreddit, word_list, after=next_page, counts=counts)
+    else:
+        sorted_counts = sorted(
+            counts.items(), key=lambda item: (-item[1], item[0])
+        )
+        for word, count in sorted_counts:
+            print("{}: {}".format(word, count))
