@@ -44,8 +44,7 @@ def count_words(subreddit, word_list, after=None, counts={}):
         for keyword in word_list:
             keyword = keyword.lower()
             if (
-                keyword in title
-                and not title.startswith(keyword + '.')
+                keyword in title and not title.startswith(keyword + '.')
                 and not title.startswith(keyword + '!')
                 and not title.startswith(keyword + '_')
             ):
