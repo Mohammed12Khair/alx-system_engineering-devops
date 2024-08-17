@@ -41,7 +41,9 @@ def count_words(subreddit, word_list, after=None, counts={}):
         title = post['data']['title'].lower()
         for keyword in word_list:
             keyword = keyword.lower()
-            if (keyword in title and not title.startswith(keyword + '.') and not title.startswith(keyword + '!') and not title.startswith(keyword + '_')):
+            if (keyword in title and not title.startswith(keyword + '.') and
+                    not title.startswith(keyword + '!') and
+                    not title.startswith(keyword + '_')):
                 counts[keyword] = counts.get(keyword, 0) + 1
 
     next_page = data.get('data', {}).get('after')
