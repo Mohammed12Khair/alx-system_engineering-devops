@@ -13,6 +13,7 @@ def top_ten(subreddit: str) -> None:
     Returns:
         None
     """
+    subreddit = 'action'
     base_url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
     request = requests.get(
         base_url, headers={'User-Agent': 'Agent Uche'}, allow_redirects=False
@@ -20,6 +21,7 @@ def top_ten(subreddit: str) -> None:
     data = request.json()
     try:
         for i in range(10):
+            # print(data)
             print(data['data']['children'][i]['data']['title'])
     except Exception:
         print('None')
