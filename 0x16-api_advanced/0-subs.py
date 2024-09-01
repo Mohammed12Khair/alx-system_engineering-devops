@@ -18,6 +18,6 @@ def number_of_subscribers(subreddit) -> int:
     try:
         request = requests.get(base_url, headers={'User-Agent': 'Agent Uche'})
         data = request.json()
-        return str(data['data']['subscribers']).strip()
+        return data['data']['subscribers']
     except Exception:
         return 0
