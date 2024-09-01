@@ -21,6 +21,6 @@ def number_of_subscribers(subreddit):
         # parse JSON response to extract no of subscribers
         data = response.json().get('data', {})
         sub_count = data.get('subscribers', 0)
-        return sub_count
+        return int(sub_count)
     else:
         return 0
